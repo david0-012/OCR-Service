@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: ocr_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ocruser
+      POSTGRES_PASSWORD: ocrpassword
+      POSTGRES_DB: ocrdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ocruser -d ocrdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
