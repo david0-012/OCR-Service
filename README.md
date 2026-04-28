@@ -1,6 +1,6 @@
 # OCR Service
 
-Servicio de OCR y procesamiento de documentos usando **FastAPI**, **Azure Document Intelligence** y **PostgreSQL**.
+Servicio de OCR y procesamiento de documentos usando **Python** **FastAPI**, **Azure Document Intelligence** y **PostgreSQL**.
 
 ## Documentación
 
@@ -22,9 +22,15 @@ En la carpeta `docs/` encontrarás:
 
 ## Instalación de uv
 
-`uv` es un gestor de paquetes rápido para Python. Instálalo así:
+`uv` es un gestor de paquetes rápido para Python.
 
-**Opción 1: Script**
+**Opción 1: Con pip (recomendado para comenzar)**
+
+```bash
+pip install uv
+```
+
+**Opción 2: Script**
 
 **Windows (PowerShell)**:
 ```bash
@@ -36,12 +42,6 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-**Opción 2: Con pip**
-
-```bash
-pip install uv
-```
-
 Verifica la instalación:
 ```bash
 uv --version
@@ -51,65 +51,43 @@ uv --version
 
 ## Instalación y Ejecución
 
-### Opción 1: Con `uv` (recomendado)
+### Paso 1: Sincronizar dependencias y crear entorno virtual
 
 ```bash
-# Sincronizar dependencias (crea .venv automáticamente)
 uv sync
-
-# Ejecutar la aplicación
-uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### Opción 2: Con `pip`
+Esto creará automáticamente el entorno virtual `.venv` e instalará las dependencias.
 
+---
+
+### Paso 2: Activar el entorno virtual
+
+**Windows:**
 ```bash
-# Crear entorno virtual
-python -m venv .venv
-
-# Activar (Windows)
 .venv\Scripts\Activate.ps1
-
-# Activar (Linux/Mac)
-source .venv/bin/activate
-
-# Instalar dependencias
-pip install -r requirements.txt
-
-# Ejecutar
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### Configuración
+**Linux/Mac:**
+```bash
+source .venv/bin/activate
+```
 
-Toma de ejemplo `.env.example` para crear `.env` y completa las variables:
+---
+
+### Paso 3: Configuración del entorno
+
+Toma de ejemplo [`.env.example`](.env.example) para crear `.env` y completa las variables:
 
 ```env
-# URL de conexión a la base de datos PostgreSQL.
 DATABASE_URL=postgresql://usuario:contraseña@servidor:puerto/base_datos
-
-# Nombre de la aplicación
 APP_NAME=OCR Service
-
-# Versión de la aplicación
 APP_VERSION=1.0.0
-
-# Modo debug (true/false). Usar false en producción.
 DEBUG=False
-
-# Directorio donde se guardan los archivos subidos
 UPLOAD_DIR=tmp/uploads
-
-# Tamaño máximo permitido por archivo (en MB)
 MAX_FILE_SIZE_MB=10
-
-# Orígenes permitidos para CORS (separados por comas)
 CORS_ORIGINS=http://localhost:3000,http://localhost:8000
-
-# Clave API de Azure (para OCR o servicios cognitivos)
 AZURE_API_KEY=api_key
-
-# Endpoint de Azure para el servicio correspondiente
 AZURE_ENDPOINT=endpoint
 ```
 
@@ -118,27 +96,35 @@ AZURE_ENDPOINT=endpoint
 2. Ve a "Claves y punto de conexión"
 3. Copia la API Key (Clave 1 o 2) y Endpoint (Extremo) en `.env`
 
-### PostgreSQL
+---
 
-Ejecutar compose para levantar el servicio de base de datos PostgreSQL:
+### Paso 4: Levantar base de datos PostgreSQL con Docker
 
+Ejecuta en la terminal:
 ```bash
 docker-compose up -d
 ```
 
 ---
 
-## API
+### Paso 5: Ejecutar la aplicación
 
-API: **http://localhost:8000**  
-Docs: **http://localhost:8000/docs**
-
-### Endpoints
-
-**POST** `/documentos` - Subir archivo
-
-**GET** `/documentos/{id}` - Obtener documento detallado
-
-**GET** `/documentos` - Listar documentos
+Ejecuta en la terminal:
+```bash
+uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
 
 ---
+
+## API
+
+API: http://localhost:8000  
+Docs: http://localhost:8000/docs
+
+### Endpoints diponibles
+
+- **POST** /documentos - Cargar documento para realizar OCR
+
+- **GET** /documentos/{id} - Obtener documento detallado con resultados de OCR
+
+- **GET** /documentos - Listar documentos almacenados en la base de datos
